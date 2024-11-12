@@ -13,6 +13,7 @@ npm-debug.log
 
 # Miscellaneous
 frontend/.angular/cache
+backend/.env
 
 # System files
 .DS_Store
