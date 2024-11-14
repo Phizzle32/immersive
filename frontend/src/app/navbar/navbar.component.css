@@ -1,0 +1,16 @@
+.user-button {
+    height: auto;
+    width: auto;
+
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    margin-left: auto;
+    padding: 5px;
+}
+
+.user-icon {
+    font-size: 36px;
+    height: auto;
+    width: auto;
+}
