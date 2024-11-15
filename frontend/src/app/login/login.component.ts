@@ -1,6 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { Auth, signInWithEmailAndPassword } from '@angular/fire/auth';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -12,44 +14,40 @@ import { CommonModule } from '@angular/common';
 
 export class LoginComponent implements OnInit {
   loginForm!: FormGroup;
-  signupForm!: FormGroup;
-  isLoginMode = true;
+  errorMsg: String | null = null;
 
-  constructor(private fb: FormBuilder) { }
+  constructor(
+    private fb: FormBuilder,
+    private auth: Auth,
+    private router: Router,
+  ) { }
 
   ngOnInit(): void {
     // Initialize login form
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
-    });
-
-    // Initialize signup form
-    this.signupForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      name: ['', [Validators.required, Validators.minLength(2), Validators.pattern('^[a-zA-Z]+[a-zA-Z ]*$')]],
-      phone: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [Validators.required]]
     });
   }
 
-  onSwitchMode() {
-    this.isLoginMode = !this.isLoginMode;
+  register() {
+    this.router.navigate(['/register']);
   }
 
   onSubmit() {
-    if (this.isLoginMode) {
-      if (this.loginForm.invalid) {
-        return;
-      }
-      // TODO: Authenticate user 
-      console.log("Login Form Submitted", this.loginForm?.value);
-    } else {
-      if (this.signupForm.invalid) {
-        return;
-      }
-      // TODO: Send create user request to the backend and sign in
-      console.log("Signup Form Submitted", this.signupForm?.value);
+    if (this.loginForm.invalid) {
+      this.errorMsg = "Please fill out all fields";
+      return;
     }
+
+    const { email, password } = this.loginForm.value;
+    signInWithEmailAndPassword(this.auth, email, password)
+      .then((userCredential) => {
+        console.log(userCredential);
+        this.router.navigate(['/']);
+      }).catch((e) => {
+        console.log("Login error:", e);
+        this.errorMsg = "Incorrect email or password";
+      });
   }
 }

@@ -9,17 +9,19 @@ import { db, checkDatabaseConnection } from "./database.js";
 const app = express();
 const PORT = 8080;
 
+app.use(express.json());
+
 checkDatabaseConnection().then(() => {
     app.get('/', (req, res) => {
         res.send('Server is running');
     });
 
     // API routes
-    app.use('/category', categoryRoutes);
-    app.use('/item', itemRoutes);
-    app.use('/review', reviewRoutes);
-    app.use('/user', userRoutes);
-    app.use('/transaction', transactionRoutes);
+    app.use('/api/category', categoryRoutes);
+    app.use('/api/item', itemRoutes);
+    app.use('/api/review', reviewRoutes);
+    app.use('/api/user', userRoutes);
+    app.use('/api/transaction', transactionRoutes);
 
     process.on('SIGINT', () => {
         console.log('Stopping server...');
