@@ -1,0 +1,38 @@
+.search-bar {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    gap: 5px;
+    margin: 10px;
+}
+
+.search-bar input,
+.search-bar select {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.search-bar input {
+    width: 800px;
+    padding-right: 30px;
+}
+
+.search-bar mat-icon {
+    align-self: center;
+    margin-left: -32px;
+}
+
+.item-list {
+    margin: 10px;
+}
+
+mat-card {
+    border-color: gray;
+    margin-bottom: 5px;
+}
+
+a {
+    color: black;
+    text-decoration: none;
+}

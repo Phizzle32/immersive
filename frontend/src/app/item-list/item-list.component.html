@@ -1,1 +1,30 @@
-<p>Wow there are a lot of items here!</p>
+<div class="search-bar">
+  <select [(ngModel)]="selectedCategory" (change)="onSearch()">
+    <option value="0">All Categories</option>
+    <option *ngFor="let category of categories$ | async" [value]="category.category_id">
+      {{ category.category_name }}
+    </option>
+  </select>
+  <input type="text" [(ngModel)]="query" placeholder="Search for items..." (ngModelChange)="onSearch()" />
+  <mat-icon>search</mat-icon>
+</div>
+
+<div class="item-list">
+  <div *ngIf="(items$ | async)?.length === 0" class="no-items">
+    No items found.
+  </div>
+  <div *ngFor="let item of items$ | async">
+    <mat-card appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>
+          <a routerLink={{item.item_id}}>{{ item.item_title }}</a>
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p>{{ item.description }}</p>
+        <p><strong>Price:</strong> ${{ item.item_amount }}</p>
+        <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

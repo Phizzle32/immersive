@@ -13,6 +13,39 @@ router.get('/', async (req, res) => {
     }
 });
 
+// Get items by their name or category
+router.get('/search', async (req, res) => {
+    const { query, category_id } = req.query;
+    try {
+        let sqlQuery = `
+            SELECT * FROM item 
+            INNER JOIN category USING (category_id)
+            WHERE (item_title LIKE ? OR category_name LIKE ?)
+        `
+        const queryParams = [`%${query}%`, `%${query}%`];
+
+        // If category is provided, filter for items in the category
+        if (category_id) {
+            sqlQuery += ` AND category_id = ?`
+            queryParams.push(category_id);
+        }
+
+        sqlQuery += `
+            ORDER BY 
+                CASE 
+                    WHEN item_title LIKE ? THEN 1
+                    ELSE 2
+                END,
+            item_title;`;
+        queryParams.push(`%${query}%`);
+
+        const [items] = await db.query(sqlQuery, queryParams);
+        res.send(items);
+    } catch (err) {
+        res.status(500).send({ error: 'Internal Server Error' });
+    }
+});
+
 // Get item by id
 router.get('/:id', async (req, res) => {
     const { id } = req.params;
@@ -22,29 +55,6 @@ router.get('/:id', async (req, res) => {
             return res.status(404).send({ message: 'Item not found' });
         }
         res.send(item);
-    } catch (err) {
-        res.status(500).send({ error: 'Internal Server Error' });
-    }
-});
-
-// Get items by their name or category
-router.get('/search/:query', async (req, res) => {
-    const { query } = req.params;
-
-    try {
-        const [items] = await db.query(
-            `SELECT * FROM item 
-            INNER JOIN category USING (category_id)
-            WHERE item_title LIKE ? OR category_name LIKE ?
-            ORDER BY 
-                CASE 
-                    WHEN item_title LIKE ? THEN 1
-                    ELSE 2
-                END,
-            item_title;`,
-            [`%${query}%`, `%${query}%`, `%${query}%`]
-        );
-        res.send(items);
     } catch (err) {
         res.status(500).send({ error: 'Internal Server Error' });
     }
