@@ -1,0 +1,50 @@
+.item-details {
+    padding-left: 5px;
+}
+
+.item-details p {
+    padding-left: 8px;
+}
+
+.item-details button {
+    margin-left: 8px;
+}
+
+.reviews {
+    margin-top: 40px;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+}
+
+mat-card {
+    border-color: gray;
+    margin-bottom: 10px;
+}
+
+.review-date {
+    margin-left: auto;
+}
+
+.review-form {
+    margin: 30px 5px 0px;
+    padding: 20px;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    background-color: #fafafa;
+}
+
+.rating {
+    width: 110px;
+}
+
+mat-form-field {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.error {
+    margin-top: 5px;
+    color: red;
+    font-size: 14px;
+}

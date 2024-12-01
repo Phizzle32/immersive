@@ -5,9 +5,8 @@
   <mat-menu #dropdown>
     <button mat-menu-item routerLink="items">Items</button>
     <button mat-menu-item routerLink="transaction">Transactions</button>
-    <button mat-menu-item routerLink="review">Reviews</button>
   </mat-menu>
-  <span>Immersive</span>
+  <span routerLink="items">Immersive</span>
   <mat-icon>shopping_bag</mat-icon>
   <button mat-icon-button class="user-button" [matMenuTriggerFor]="userMenu">
     <mat-icon class="user-icon">account_circle</mat-icon>

@@ -18,9 +18,11 @@ router.get('/:item_id', async (req, res) => {
     const { item_id } = req.params;
     try {
         const [reviews] = await db.query(`
-            SELECT * FROM review
+            SELECT review.*, user.name AS reviewer_name
+            FROM review
             INNER JOIN user ON user.id = review.reviewer_id
-            WHERE item_id = ?`,
+            WHERE item_id = ?
+            ORDER BY review.review_date DESC;`,
             [item_id]);
         res.send(reviews);
     } catch (err) {
@@ -77,10 +79,12 @@ router.post('/create', async (req, res) => {
             [item_id, reviewer_id, review_date, comment, rating]
         );
 
+        const [reviewer] = await db.query('SELECT name FROM User WHERE id = ?', [reviewer_id]);
         const newReview = {
             review_id: result.insertId,
             item_id,
             reviewer_id,
+            reviewer_name: reviewer[0].name,
             review_date,
             comment,
             rating

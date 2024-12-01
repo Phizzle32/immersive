@@ -14,3 +14,7 @@
     height: auto;
     width: auto;
 }
+
+span {
+    cursor: pointer;
+}
