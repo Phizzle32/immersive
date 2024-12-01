@@ -35,8 +35,7 @@ router.get('/search', async (req, res) => {
                 CASE 
                     WHEN item_title LIKE ? THEN 1
                     ELSE 2
-                END,
-            item_title;`;
+                END;`;
         queryParams.push(`%${query}%`);
 
         const [items] = await db.query(sqlQuery, queryParams);
@@ -50,11 +49,17 @@ router.get('/search', async (req, res) => {
 router.get('/:id', async (req, res) => {
     const { id } = req.params;
     try {
-        const [item] = await db.query('SELECT * FROM item WHERE item_id = ?', [id]);
+        const [item] = await db.query(`
+            SELECT item.*, user.name AS seller_name 
+            FROM item
+            INNER JOIN user ON user.id = item.seller_id
+            WHERE item_id = ?`
+            , [id]
+        );
         if (!item) {
             return res.status(404).send({ message: 'Item not found' });
         }
-        res.send(item);
+        res.send(item[0]);
     } catch (err) {
         res.status(500).send({ error: 'Internal Server Error' });
     }

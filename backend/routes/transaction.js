@@ -32,50 +32,62 @@ router.get('/user/:user_id', async (req, res) => {
 
 // Create a new transaction
 router.post('/create', async (req, res) => {
-    const { item_id, buyer_id, seller_id } = req.body;
+    const {itemId, buyerId} = req.body;
+    const transaction_date = new Date().toISOString().split('T')[0];
 
-    // Validate input data
-    if (!item_id || !buyer_id || !seller_id) {
+    if(!itemId || !buyerId) {
         return res.status(400).send({ error: 'Missing required fields' });
     }
 
-    const transaction_date = new Date().toISOString().split('T')[0];
+    const connection = await db.getConnection();
 
     try {
-        // Check if the item exists
-        const [itemExists] = await db.query('SELECT COUNT(*) AS count FROM Item WHERE item_id = ?', [item_id]);
-        if (itemExists.count === 0) {
+        await connection.beginTransaction();
+
+        // Check if the item exists and is in stock
+        const [item] = await connection.query('SELECT * FROM Item WHERE item_id = ?', [itemId]);
+        if (item.length === 0) {
             return res.status(404).send({ error: 'Item not found' });
+        } else if (item[0].quantity <= 0) {
+            return res.status(400).send({ error: 'Item is out of stock' });
         }
 
-        // Check if the buyer and seller exist
-        const [buyerExists] = await db.query('SELECT COUNT(*) AS count FROM User WHERE id = ?', [buyer_id]);
-        const [sellerExists] = await db.query('SELECT COUNT(*) AS count FROM User WHERE id = ?', [seller_id]);
-        if (buyerExists.count === 0) {
+        const sellerId = item[0].seller_id;
+    
+        // Check if the buyer exists
+        const [buyer] = await connection.query('SELECT COUNT(*) AS count FROM User WHERE id = ?', [buyerId]);
+        if (buyer[0].count === 0) {
             return res.status(404).send({ error: 'Buyer not found' });
         }
-        if (sellerExists.count === 0) {
-            return res.status(404).send({ error: 'Seller not found' });
-        }
 
-        const result = await db.query(
+        // Reduce the item quantity
+        await connection.query('UPDATE item SET quantity = quantity - 1 WHERE item_id = ?', [itemId]);
+
+        // Create the transaction
+        const result = await connection.query(
             `INSERT INTO Transaction (item_id, buyer_id, seller_id, date)
              VALUES (?, ?, ?, ?)`,
-            [item_id, buyer_id, seller_id, transaction_date]
+            [itemId, buyerId, sellerId, transaction_date]
         );
+
+        // If everything is successful, commit the transaction
+        await connection.commit();
 
         const newTransaction = {
             trans_id: result.insertId,
-            item_id,
-            buyer_id,
-            seller_id,
+            item_id: itemId,
+            buyer_id: buyerId,
+            seller_id: sellerId,
             transaction_date
         };
 
         res.status(201).send(newTransaction);
     } catch (err) {
+        await connection.rollback();
         console.error(err);
         res.status(500).send({ error: 'Internal Server Error' });
+    } finally {
+        connection.release();
     }
 });
 

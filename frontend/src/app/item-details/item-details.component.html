@@ -1,1 +1,56 @@
-<p>Wow there are a lot of details here!</p>
+<div class="item-details" *ngIf="item$ | async as item; else loading">
+    <h2>{{ item.item_title }}</h2>
+    <p><strong>Description:</strong> {{ item.description }}</p>
+    <p><strong>Amount:</strong> ${{ item.item_amount }}</p>
+    <p><strong>Quantity Available:</strong> {{ item.quantity }}</p>
+    <p><strong>Seller:</strong> {{ item.seller_name }}</p>
+    <p *ngIf="reviews$ | async as reviews">
+        <strong>Rating:</strong> {{ getAverageRating(reviews) }}
+    </p>
+    <button mat-raised-button color="primary" [disabled]="(item.quantity < 1)" (click)="onBuy()">
+        Buy
+    </button>
+</div>
+<ng-template #loading>
+    <p>Loading item details...</p>
+</ng-template>
+
+<div class="reviews">
+    <h2>Reviews</h2>
+    <div *ngIf="reviews$ | async as reviews">
+        <div *ngIf="reviews.length === 0" class="no-reviews">
+            <p>No reviews yet for this item.</p>
+        </div>
+        <div *ngFor="let review of reviews">
+            <mat-card>
+                <mat-card-header>
+                    <mat-card-title>{{ review.reviewer_name }}</mat-card-title>
+                    <span class="review-date">{{ review.review_date | date: 'MMM d, y' }}</span>
+                    <mat-card-subtitle>Rating: {{ review.rating }}/5</mat-card-subtitle>
+                </mat-card-header>
+                <mat-card-content>
+                    {{ review.comment }}
+                </mat-card-content>
+            </mat-card>
+        </div>
+    </div>
+    <div class="review-form">
+        <h3>Leave a Review</h3>
+        <form (ngSubmit)="onSubmitReview()" [formGroup]="reviewForm">
+            <mat-form-field class="rating">
+                <mat-label>Rating</mat-label>
+                <mat-select formControlName="rating" required>
+                    <mat-option *ngFor="let rating of ratings" [value]="rating">{{ rating }}</mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-form-field>
+                <mat-label>Your Comment</mat-label>
+                <textarea matInput formControlName="comment" required></textarea>
+            </mat-form-field>
+
+            <button mat-raised-button color="primary" type="submit" [disabled]="reviewForm.invalid">Submit</button>
+            <div *ngIf="errorMsg" class="error">{{ errorMsg }}</div>
+        </form>
+    </div>
+</div>

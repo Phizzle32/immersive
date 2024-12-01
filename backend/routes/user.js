@@ -13,12 +13,27 @@ router.get('/', async (req, res) => {
     }
 });
 
+// Get a specific user by email
+router.get('/email/:email', async (req, res) => {
+    const { email } = req.params;
+    try {
+        const [user] = await db.query('SELECT * FROM user WHERE email = ?', [email]);
+        if (user.length === 0) {
+            return res.status(404).send({ error: 'User not found' });
+        }
+        res.status(200).send(user[0]);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({ error: 'Internal Server Error' });
+    }
+});
+
 // Get a specific user by ID
 router.get('/:id', async (req, res) => {
     const { id } = req.params;
     try {
         const [user] = await db.query('SELECT * FROM user WHERE id = ?', [id]);
-        res.send(user);
+        res.send(user[0]);
     } catch (err) {
         res.status(500).send({ error: 'Internal Server Error' });
     }
