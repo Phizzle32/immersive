@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { Auth, signInWithEmailAndPassword } from '@angular/fire/auth';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
@@ -18,7 +18,7 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private auth: Auth,
+    private auth: AngularFireAuth,
     private router: Router,
   ) { }
 
@@ -41,9 +41,8 @@ export class LoginComponent implements OnInit {
     }
 
     const { email, password } = this.loginForm.value;
-    signInWithEmailAndPassword(this.auth, email, password)
-      .then((userCredential) => {
-        console.log(userCredential);
+    this.auth.signInWithEmailAndPassword(email, password)
+      .then(() => {
         this.router.navigate(['/']);
       }).catch((e) => {
         console.log("Login error:", e);

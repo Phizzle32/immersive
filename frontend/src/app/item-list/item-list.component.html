@@ -11,13 +11,13 @@
 
 <div class="item-list">
   <div *ngIf="(items$ | async)?.length === 0" class="no-items">
-    No items found.
+    No items found
   </div>
   <div *ngFor="let item of items$ | async">
     <mat-card appearance="outlined">
       <mat-card-header>
         <mat-card-title>
-          <a routerLink={{item.item_id}}>{{ item.item_title }}</a>
+          <a [routerLink]="['/items', item.item_id]">{{ item.item_title }}</a>
         </mat-card-title>
       </mat-card-header>
       <mat-card-content>
@@ -25,6 +25,9 @@
         <p><strong>Price:</strong> ${{ item.item_amount }}</p>
         <p><strong>Quantity:</strong> {{ item.quantity }}</p>
       </mat-card-content>
+      <mat-card-actions *ngIf="isUserListings">
+        <button mat-flat-button color="primary" (click)="onEdit(item)">Edit</button>
+      </mat-card-actions>
     </mat-card>
   </div>
 </div>
