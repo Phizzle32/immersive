@@ -20,8 +20,7 @@ router.get('/search', async (req, res) => {
         let sqlQuery = `
             SELECT * FROM item 
             INNER JOIN category USING (category_id)
-            WHERE (item_title LIKE ? OR category_name LIKE ?)
-        `
+            WHERE (item_title LIKE ? OR category_name LIKE ?)`;
         const queryParams = [`%${query}%`, `%${query}%`];
 
         // If category is provided, filter for items in the category
@@ -39,6 +38,56 @@ router.get('/search', async (req, res) => {
         queryParams.push(`%${query}%`);
 
         const [items] = await db.query(sqlQuery, queryParams);
+        res.send(items);
+    } catch (err) {
+        res.status(500).send({ error: 'Internal Server Error' });
+    }
+});
+
+// Search a user's items
+router.get('/user/:user_id/search', async (req, res) => {
+    const { user_id } = req.params;
+    const { query, category_id } = req.query;
+
+    let sqlQuery = `
+        SELECT * FROM item
+        INNER JOIN category USING (category_id)
+        WHERE seller_id = ?`;
+    const queryParams = [user_id];
+
+    // Add filtering based on item title or category name
+    if (query) {
+        sqlQuery += ` AND (item_title LIKE ? OR category_name LIKE ?)`;
+        queryParams.push(`%${query}%`, `%${query}%`);
+    }
+
+    // Add filtering based on category if provided
+    if (category_id) {
+        sqlQuery += ` AND category_id = ?`;
+        queryParams.push(category_id);
+    }
+
+    sqlQuery += `
+            ORDER BY 
+                CASE 
+                    WHEN item_title LIKE ? THEN 1
+                    ELSE 2
+                END;`;
+    queryParams.push(`%${query}%`);
+
+    try {
+        const [items] = await db.query(sqlQuery, queryParams);
+        res.send(items);
+    } catch (err) {
+        res.status(500).send({ error: 'Internal Server Error' });
+    }
+});
+
+// Get all items of a user
+router.get('/user/:user_id', async (req, res) => {
+    const { user_id } = req.params;
+    try {
+        const [items] = await db.query('SELECT * FROM item WHERE seller_id = ?', [user_id]);
         res.send(items);
     } catch (err) {
         res.status(500).send({ error: 'Internal Server Error' });
@@ -116,7 +165,7 @@ router.post('/create', async (req, res) => {
 });
 
 // Update an existing item
-router.patch('/update/:item_id', async (req, res) => {
+router.patch('/:item_id', async (req, res) => {
     const { item_id } = req.params;
     const { item_amount, description, seller_id, category_id, quantity, item_title } = req.body;
 

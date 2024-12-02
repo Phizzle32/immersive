@@ -18,7 +18,7 @@ import { Transaction, User, UserService, UserTransaction } from '../user.service
   styleUrl: './transactions.component.css'
 })
 export class TransactionsComponent implements OnInit, OnDestroy {
-  user$: Observable<User | null> = of(null);
+  user$: Observable<User | null> = this.userService.getCurrentUser();
   purchases: Transaction[] = [];
   sales: Transaction[] = [];
   totalExpense: number = 0;
@@ -33,8 +33,6 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    this.user$ = this.userService.getCurrentUser();
-
     this.user$.pipe(takeUntil(this.destroy$)).subscribe((user) => {
       if (user) {
         this.userService.getTransactions(user.id)

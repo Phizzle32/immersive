@@ -1,11 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { RouterModule } from '@angular/router';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
 import { ItemService, Item, Category } from '../item.service';
+import { User, UserService } from '../user.service';
 
 @Component({
   selector: 'app-item-list',
@@ -13,6 +16,7 @@ import { ItemService, Item, Category } from '../item.service';
   imports: [
     CommonModule,
     FormsModule,
+    MatButtonModule,
     MatCardModule,
     MatIconModule,
     RouterModule
@@ -20,24 +24,63 @@ import { ItemService, Item, Category } from '../item.service';
   templateUrl: './item-list.component.html',
   styleUrl: './item-list.component.css'
 })
-export class ItemListComponent implements OnInit {
+export class ItemListComponent implements OnInit, OnDestroy {
+  @Input() isUserListings: boolean = false;
+  @Output() editItemEvent = new EventEmitter<Item>;
+
   items$: Observable<Item[]> = new Observable<Item[]>();
-  categories$: Observable<Category[]> = new Observable<Category[]>();
+  categories$: Observable<Category[]> = this.itemService.loadCategories();
+  user$: Observable<User | null> = this.userService.getCurrentUser();
   query: string = '';
   selectedCategory: number = 0;
 
-  constructor(private itemService: ItemService) { }
+  private searchParams$ = new BehaviorSubject<{ query: string, category: number }>({ query: '', category: 0 });
+  private destroy$ = new Subject<void>();
+
+  constructor(
+    private itemService: ItemService,
+    private userService: UserService,
+    private snackBar: MatSnackBar,
+  ) { }
 
   ngOnInit(): void {
-    this.items$ = this.itemService.loadItems();
-    this.categories$ = this.itemService.loadCategories()
+    if (this.isUserListings) {
+      this.items$ = combineLatest([this.user$, this.searchParams$]).pipe(
+        takeUntil(this.destroy$),
+        switchMap(([user, params]) => {
+          if (user) {
+            const { query, category } = params;
+            return category !== 0
+              ? this.itemService.searchUserItems(user.id, query, category)
+              : this.itemService.searchUserItems(user.id, query);
+          } else {
+            this.snackBar.open('Log in to see your listings', 'Close', { duration: 3000 });
+            return of([]);
+          }
+        })
+      );
+    } else {
+      this.items$ = this.searchParams$.pipe(
+        takeUntil(this.destroy$),
+        switchMap(({ query, category }) => {
+          return category !== 0
+            ? this.itemService.searchItems(query, category)
+            : this.itemService.searchItems(query);
+        })
+      );
+    }
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  onEdit(item: Item) {
+    this.editItemEvent.emit(item);
   }
 
   onSearch(): void {
-    if (this.selectedCategory != 0) {
-      this.items$ = this.itemService.searchItems(this.query, this.selectedCategory);
-    } else {
-      this.items$ = this.itemService.searchItems(this.query);
-    }
+    this.searchParams$.next({ query: this.query, category: this.selectedCategory });
   }
 }

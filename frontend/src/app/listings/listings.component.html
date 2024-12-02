@@ -1,0 +1,6 @@
+<div class="header">
+    <h2>My Listings</h2>
+    <button mat-flat-button color="primary" (click)="openCreateModal()">Create Listing</button>
+</div>
+
+<app-item-list [isUserListings]="true" (editItemEvent)="openEditModal($event)"></app-item-list>

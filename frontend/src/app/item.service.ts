@@ -44,6 +44,15 @@ export class ItemService {
     );
   }
 
+  loadUserItems(userId: number): Observable<Item[]> {
+    return this.http.get<Item[]>(`/api/item/user/${userId}`).pipe(
+      catchError((error) => {
+        console.error('Error loading items:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
   loadCategories(): Observable<Category[]> {
     return this.http.get<Category[]>('/api/category').pipe(
       catchError((error) => {
@@ -66,6 +75,19 @@ export class ItemService {
     );
   }
 
+  searchUserItems(userId: number, query: string, categoryId?: number): Observable<Item[]> {
+    let url = `/api/item/user/${userId}/search?query=${query}`;
+    if (categoryId) {
+      url += `&category_id=${categoryId}`;
+    }
+    return this.http.get<Item[]>(url).pipe(
+      catchError((error) => {
+        console.error('Error loading items:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
   getItem(itemId: number): Observable<Item> {
     return this.http.get<Item>(`/api/item/${itemId}`).pipe(
       catchError((error) => {
@@ -76,9 +98,27 @@ export class ItemService {
   }
 
   buyItem(itemId: number, buyerId: number): Observable<any> {
-    return this.http.post<Item>('/api/transaction/create', {itemId, buyerId}).pipe(
+    return this.http.post<any>('/api/transaction/create', {itemId, buyerId}).pipe(
       catchError((error) => {
         console.error('Error processing purchase:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  createItem(item: Item): Observable<Item> {
+    return this.http.post<Item>('/api/item/create', item).pipe(
+      catchError((error) => {
+        console.error('Error creating item:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  updateItem(item: Item): Observable<Item> {
+    return this.http.patch<Item>(`api/item/${item.item_id}`, item).pipe(
+      catchError((error) => {
+        console.error('Error updating item:', error);
         return throwError(() => error);
       })
     );

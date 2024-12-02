@@ -1,0 +1,16 @@
+.header {
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding: 10px;
+}
+
+.header h2 {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.header button {
+    margin-left: auto;
+}
