@@ -18,12 +18,23 @@ router.get('/user/:user_id', async (req, res) => {
     const { user_id } = req.params;
 
     try {
-        const [transactions] = await db.query(
-            `SELECT * FROM transaction 
-             WHERE buyer_id = ? OR seller_id = ?`,
-            [user_id, user_id]
+        const [purchases] = await db.query(
+            `SELECT t.trans_id, i.item_title, i.item_amount AS price, t.date
+             FROM transaction t
+             INNER JOIN item i ON t.item_id = i.item_id
+             WHERE t.buyer_id = ?
+             ORDER BY t.date DESC`,
+            [user_id]
         );
-        res.send(transactions);
+        const [sales] = await db.query(`
+            SELECT t.trans_id, i.item_title, i.item_amount AS price, t.date
+            FROM Transaction t
+            JOIN Item i ON t.item_id = i.item_id
+            WHERE t.seller_id = ?
+            ORDER BY t.date DESC
+        `, [user_id]);
+
+        res.send({ purchases, sales });
     } catch (err) {
         console.error(err);
         res.status(500).send({ error: 'Internal Server Error' });

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { Auth, onAuthStateChanged, signOut } from '@angular/fire/auth';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
@@ -24,20 +24,16 @@ import { Router, RouterModule } from '@angular/router';
 export class NavbarComponent implements OnInit{
   loggedIn = false;
 
-  constructor(private router: Router, private auth: Auth) { }
+  constructor(private router: Router, private auth: AngularFireAuth) { }
 
   ngOnInit(): void {
-    onAuthStateChanged(this.auth, (user) => {
-      if (user) {
-        this.loggedIn = true;
-      } else {
-        this.loggedIn = false;
-      }
+    this.auth.authState.subscribe((user) => {
+      this.loggedIn = !!user;
     });
   }
 
   logout() {
-    signOut(this.auth).then(() => {
+    this.auth.signOut().then(() => {
       this.loggedIn = false;
       this.router.navigate(['login']);
     }).catch((error) => {
