@@ -23,7 +23,6 @@ export class LoginComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // Initialize login form
     this.loginForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required]]
@@ -43,7 +42,7 @@ export class LoginComponent implements OnInit {
     const { email, password } = this.loginForm.value;
     this.auth.signInWithEmailAndPassword(email, password)
       .then(() => {
-        this.router.navigate(['/']);
+        this.router.navigate(['/items']);
       }).catch((e) => {
         console.log("Login error:", e);
         this.errorMsg = "Incorrect email or password";

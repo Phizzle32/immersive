@@ -26,7 +26,6 @@ export class RegisterComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // Initialize signup form
     this.signupForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       name: ['', [Validators.required, Validators.minLength(2), Validators.pattern('^[a-zA-Z]+[a-zA-Z ]*$')]],
@@ -49,7 +48,7 @@ export class RegisterComponent implements OnInit {
     const result = await this.userService.registerUser(email, password, name, phone);
 
     if (result.success) {
-      this.router.navigate(['/']);
+      this.router.navigate(['/items']);
     } else {
       this.errorMsg = result.error;
     }

@@ -19,20 +19,18 @@ router.get('/user/:user_id', async (req, res) => {
 
     try {
         const [purchases] = await db.query(
-            `SELECT t.trans_id, i.item_title, i.item_amount AS price, t.date
-             FROM transaction t
-             INNER JOIN item i ON t.item_id = i.item_id
-             WHERE t.buyer_id = ?
-             ORDER BY t.date DESC`,
+            `SELECT trans_id, item_title, price, date
+             FROM Transaction
+             WHERE buyer_id = ?
+             ORDER BY date DESC`,
             [user_id]
         );
-        const [sales] = await db.query(`
-            SELECT t.trans_id, i.item_title, i.item_amount AS price, t.date
-            FROM Transaction t
-            JOIN Item i ON t.item_id = i.item_id
-            WHERE t.seller_id = ?
-            ORDER BY t.date DESC
-        `, [user_id]);
+        const [sales] = await db.query(
+            `SELECT trans_id, item_title, price, date
+             FROM Transaction
+             WHERE seller_id = ?
+             ORDER BY date DESC`,
+             [user_id]);
 
         res.send({ purchases, sales });
     } catch (err) {
@@ -63,7 +61,7 @@ router.post('/create', async (req, res) => {
             return res.status(400).send({ error: 'Item is out of stock' });
         }
 
-        const sellerId = item[0].seller_id;
+        const { item_title, item_amount: price, seller_id: sellerId } = item[0];
     
         // Check if the buyer exists
         const [buyer] = await connection.query('SELECT COUNT(*) AS count FROM User WHERE id = ?', [buyerId]);
@@ -75,10 +73,10 @@ router.post('/create', async (req, res) => {
         await connection.query('UPDATE item SET quantity = quantity - 1 WHERE item_id = ?', [itemId]);
 
         // Create the transaction
-        const result = await connection.query(
-            `INSERT INTO Transaction (item_id, buyer_id, seller_id, date)
-             VALUES (?, ?, ?, ?)`,
-            [itemId, buyerId, sellerId, transaction_date]
+        const [result] = await connection.query(
+            `INSERT INTO Transaction (item_id, item_title, price, buyer_id, seller_id, date)
+             VALUES (?, ?, ?, ?, ?, ?)`,
+            [itemId, item_title, price, buyerId, sellerId, transaction_date]
         );
 
         // If everything is successful, commit the transaction
@@ -87,6 +85,8 @@ router.post('/create', async (req, res) => {
         const newTransaction = {
             trans_id: result.insertId,
             item_id: itemId,
+            item_title,
+            price,
             buyer_id: buyerId,
             seller_id: sellerId,
             transaction_date

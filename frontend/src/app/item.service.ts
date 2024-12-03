@@ -124,6 +124,15 @@ export class ItemService {
     );
   }
 
+  deleteItem(item: Item): Observable<Item> {
+    return this.http.delete<Item>(`api/item/${item.item_id}`).pipe(
+      catchError((error) => {
+        console.error('Error deleting item:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+
   getReviews(itemId: number): Observable<Review[]> {
     return this.http.get<Review[]>(`/api/review/${itemId}`).pipe(
       catchError((error) => {

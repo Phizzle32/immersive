@@ -7,9 +7,9 @@ import { TransactionsComponent } from './transactions/transactions.component';
 import { ListingsComponent } from './listings/listings.component';
 
 export const routes: Routes = [
-    { path: '', redirectTo: '/items', pathMatch: 'full' },
-    { path: 'items', component: ItemListComponent},
-    { path: 'items/:item_id', component: ItemDetailsComponent},
+    { path: '', redirectTo: '/login', pathMatch: 'full' },
+    { path: 'items', component: ItemListComponent },
+    { path: 'items/:item_id', component: ItemDetailsComponent },
     { path: 'login', component: LoginComponent },
     { path: 'register', component: RegisterComponent },
     { path: 'transaction', component: TransactionsComponent },

@@ -78,8 +78,8 @@ export class ListingsComponent {
             this.snackBar.open('Item updated successfully', 'Close', { duration: 3000 });
           },
           error: (err) => {
-            this.snackBar.open('Error updateing item', 'Close', { duration: 3000 }),
-              console.error('Error updating item:', err);
+            this.snackBar.open('Error updating item', 'Close', { duration: 3000 });
+            console.error('Error updating item:', err);
           },
         });
       }
