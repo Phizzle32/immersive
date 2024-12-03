@@ -27,7 +27,8 @@ table {
     margin-bottom: auto;
 }
 
-.sales p, .transactions p{
+.sales p,
+.transactions p {
     margin-bottom: 2px;
 }
 

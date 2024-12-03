@@ -18,7 +18,7 @@
 <div class="reviews">
     <h2>Reviews</h2>
     <div *ngIf="reviews$ | async as reviews">
-        <div *ngIf="reviews.length === 0" class="no-reviews">
+        <div *ngIf="reviews.length === 0">
             <p>No reviews yet for this item.</p>
         </div>
         <div *ngFor="let review of reviews">

@@ -122,7 +122,7 @@ INSERT INTO Review (item_id, reviewer_id, review_date, comment, rating) VALUES
 (4, 5, '2024-10-07', 'Loved this book! A real page-turner!', 5),
 (5, 3, '2024-09-30', 'It\'s perfect for outdoor fun.', 4);
 
-INSERT INTO Transaction (item_id, buyer_id, seller_id, date) VALUES
+INSERT INTO Transaction (item_id, item_title, price, buyer_id, seller_id, date) VALUES
 (1, 'Samsung Smart TV', 299.99, 3, 1, '2024-10-02'),
 (2, 'Leather Bomber Jacket', 49.99, 5, 2, '2024-09-28'),
 (3, 'Deluxe Coffee Machine', 39.99, 2, 3, '2024-10-06'),
@@ -132,3 +132,5 @@ INSERT INTO Transaction (item_id, buyer_id, seller_id, date) VALUES
 ### 6. Start the development server
 `npm start`
 
+## 7. Navigate to the website
+Open your browser and go to http://localhost:4200/

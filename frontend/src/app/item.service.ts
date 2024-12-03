@@ -98,7 +98,7 @@ export class ItemService {
   }
 
   buyItem(itemId: number, buyerId: number): Observable<any> {
-    return this.http.post<any>('/api/transaction/create', {itemId, buyerId}).pipe(
+    return this.http.post<any>('/api/transaction/create', { itemId, buyerId }).pipe(
       catchError((error) => {
         console.error('Error processing purchase:', error);
         return throwError(() => error);
@@ -143,7 +143,7 @@ export class ItemService {
   }
 
   submitReview(item_id: number, reviewer_id: number, comment: string, rating: number): Observable<Review> {
-    const reviewData = {item_id, reviewer_id, comment, rating};
+    const reviewData = { item_id, reviewer_id, comment, rating };
     return this.http.post<Review>('/api/review/create', reviewData).pipe(
       catchError((error) => {
         console.error('Error submitting review:', error);

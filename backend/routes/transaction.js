@@ -22,15 +22,15 @@ router.get('/user/:user_id', async (req, res) => {
             `SELECT trans_id, item_title, price, date
              FROM Transaction
              WHERE buyer_id = ?
-             ORDER BY date DESC`,
+             ORDER BY date`,
             [user_id]
         );
         const [sales] = await db.query(
             `SELECT trans_id, item_title, price, date
              FROM Transaction
              WHERE seller_id = ?
-             ORDER BY date DESC`,
-             [user_id]);
+             ORDER BY date`,
+            [user_id]);
 
         res.send({ purchases, sales });
     } catch (err) {
@@ -41,10 +41,10 @@ router.get('/user/:user_id', async (req, res) => {
 
 // Create a new transaction
 router.post('/create', async (req, res) => {
-    const {itemId, buyerId} = req.body;
+    const { itemId, buyerId } = req.body;
     const transaction_date = new Date().toISOString().split('T')[0];
 
-    if(!itemId || !buyerId) {
+    if (!itemId || !buyerId) {
         return res.status(400).send({ error: 'Missing required fields' });
     }
 
@@ -62,7 +62,7 @@ router.post('/create', async (req, res) => {
         }
 
         const { item_title, item_amount: price, seller_id: sellerId } = item[0];
-    
+
         // Check if the buyer exists
         const [buyer] = await connection.query('SELECT COUNT(*) AS count FROM User WHERE id = ?', [buyerId]);
         if (buyer[0].count === 0) {

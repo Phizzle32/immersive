@@ -57,7 +57,7 @@ export class ItemModalComponent {
         item_amount: formValue.cost,
         quantity: formValue.quantity,
         seller_id: this.data.seller_id,
-        seller_name: '', 
+        seller_name: '',
         category_id: formValue.category_id,
       };
 

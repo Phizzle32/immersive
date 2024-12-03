@@ -34,4 +34,4 @@ checkDatabaseConnection().then(() => {
 }).catch((error) => {
     console.log("Could not connect to database:", error);
     process.exit(1);
-} );
+});

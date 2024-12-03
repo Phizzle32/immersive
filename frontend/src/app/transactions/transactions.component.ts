@@ -3,7 +3,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
-import { Observable, of, Subject, takeUntil } from 'rxjs';
+import { Observable, Subject, takeUntil } from 'rxjs';
 import { Transaction, User, UserService, UserTransaction } from '../user.service';
 
 @Component({
@@ -25,7 +25,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   totalRevenue: number = 0;
   balance: number = 0;
 
-  private destroy$ = new Subject<void>()
+  private destroy$ = new Subject<void>();
 
   constructor(
     private userService: UserService,
@@ -36,7 +36,6 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     this.user$.pipe(takeUntil(this.destroy$)).subscribe((user) => {
       if (user) {
         this.userService.getTransactions(user.id)
-          .pipe(takeUntil(this.destroy$))
           .subscribe((data: UserTransaction) => {
             this.purchases = data.purchases;
             this.sales = data.sales;

@@ -99,7 +99,7 @@ router.post('/create', async (req, res) => {
 // Delete a review
 router.delete('/:review_id', async (req, res) => {
     const { review_id } = req.params;
-    
+
     try {
         // Check if the review exists before attempting to delete
         const [review] = await db.query('SELECT * FROM review WHERE review_id = ?', [review_id]);
