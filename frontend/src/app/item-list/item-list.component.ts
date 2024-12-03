@@ -50,7 +50,7 @@ export class ItemListComponent implements OnInit, OnDestroy {
         switchMap(([user, params]) => {
           if (user) {
             const { query, category } = params;
-            return category !== 0
+            return category != 0
               ? this.itemService.searchUserItems(user.id, query, category)
               : this.itemService.searchUserItems(user.id, query);
           } else {
@@ -63,7 +63,7 @@ export class ItemListComponent implements OnInit, OnDestroy {
       this.items$ = this.searchParams$.pipe(
         takeUntil(this.destroy$),
         switchMap(({ query, category }) => {
-          return category !== 0
+          return category != 0
             ? this.itemService.searchItems(query, category)
             : this.itemService.searchItems(query);
         })

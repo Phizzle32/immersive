@@ -19,7 +19,7 @@ router.get('/search', async (req, res) => {
     try {
         let sqlQuery = `
             SELECT * FROM item 
-            INNER JOIN category USING (category_id)
+            LEFT JOIN category USING (category_id)
             WHERE (item_title LIKE ? OR category_name LIKE ?)`;
         const queryParams = [`%${query}%`, `%${query}%`];
 
@@ -51,7 +51,7 @@ router.get('/user/:user_id/search', async (req, res) => {
 
     let sqlQuery = `
         SELECT * FROM item
-        INNER JOIN category USING (category_id)
+        LEFT JOIN category USING (category_id)
         WHERE seller_id = ?`;
     const queryParams = [user_id];
 

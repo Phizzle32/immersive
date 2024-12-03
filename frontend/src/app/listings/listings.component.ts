@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
@@ -25,6 +25,8 @@ import { User, UserService } from '../user.service';
   styleUrl: './listings.component.css'
 })
 export class ListingsComponent {
+  @ViewChild(ItemListComponent) itemList?: ItemListComponent;
+
   user$: Observable<User | null> = this.userService.getCurrentUser();
 
   constructor(
@@ -45,7 +47,10 @@ export class ListingsComponent {
         dialogRef.afterClosed().subscribe((result: Item | null) => {
           if (result) {
             this.itemService.createItem(result).subscribe({
-              next: () => this.snackBar.open('Item created successfully', 'Close', { duration: 3000 }),
+              next: () => {
+                this.itemList?.onSearch();
+                this.snackBar.open('Item created successfully', 'Close', { duration: 3000 });
+              },
               error: (err) => {
                 this.snackBar.open('Error creating item', 'Close', { duration: 3000 });
                 console.error('Error creating item:', err);
@@ -68,7 +73,10 @@ export class ListingsComponent {
     dialogRef.afterClosed().subscribe((result: Item | null) => {
       if (result) {
         this.itemService.updateItem(result).subscribe({
-          next: () => this.snackBar.open('Item updated successfully', 'Close', { duration: 3000 }),
+          next: () => {
+            this.itemList?.onSearch();
+            this.snackBar.open('Item updated successfully', 'Close', { duration: 3000 });
+          },
           error: (err) => {
             this.snackBar.open('Error updateing item', 'Close', { duration: 3000 }),
               console.error('Error updating item:', err);
