@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AuthError } from '@angular/fire/auth';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { catchError, firstValueFrom, Observable, of, switchMap, throwError } from 'rxjs';
+import { catchError, firstValueFrom, map, Observable, of, switchMap, throwError } from 'rxjs';
 
 export interface User {
   id: number;
@@ -80,6 +80,16 @@ export class UserService {
 
   getTransactions(userId: number): Observable<UserTransaction> {
     return this.http.get<UserTransaction>(`/api/transaction/user/${userId}`).pipe(
+      map((data: UserTransaction) => {
+        // Convert the price fields from strings to numbers
+        data.purchases.forEach((transaction) => {
+          transaction.price = Number(transaction.price);
+        });
+        data.sales.forEach((transaction) => {
+          transaction.price = Number(transaction.price);
+        });
+        return data;
+      }),
       catchError((error) => {
         console.error('Error getting transactions:', error);
         return throwError(() => error);

@@ -25,7 +25,7 @@ router.get('/search', async (req, res) => {
 
         // If category is provided, filter for items in the category
         if (category_id) {
-            sqlQuery += ` AND category_id = ?`
+            sqlQuery += ` AND category_id = ?`;
             queryParams.push(category_id);
         }
 

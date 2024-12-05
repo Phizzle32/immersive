@@ -80,6 +80,19 @@ export class ItemListComponent implements OnInit, OnDestroy {
     this.editItemEvent.emit(item);
   }
 
+  onDelete(item: Item) {
+    this.itemService.deleteItem(item).subscribe({
+      next: () => {
+        this.onSearch();
+        this.snackBar.open('Item deleted successfully', 'Close', { duration: 3000 });
+      },
+      error: (err) => {
+        this.snackBar.open('Error deleting item', 'Close', { duration: 3000 });
+        console.error('Error deleting item:', err);
+      },
+    });
+  }
+
   onSearch(): void {
     this.searchParams$.next({ query: this.query, category: this.selectedCategory });
   }
