@@ -17,11 +17,11 @@
     <mat-card appearance="outlined">
       <mat-card-header>
         <mat-card-title>
-          <a [routerLink]="['/items', item.item_id]">{{ item.item_title }}</a>
+          <a [routerLink]="['/items', item.item_id]" class="item-title">{{ item.item_title }}</a>
         </mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <p>{{ item.description }}</p>
+        <p class="item-description">{{ item.description }}</p>
         <p><strong>Price:</strong> ${{ item.item_amount }}</p>
         <p><strong>Quantity:</strong> {{ item.quantity }}</p>
       </mat-card-content>
