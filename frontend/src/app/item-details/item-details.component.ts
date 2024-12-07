@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -8,7 +8,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
-import { Observable, of, Subject, takeUntil } from 'rxjs';
+import { Observable, of, take } from 'rxjs';
 import { ItemService, Item, Review } from '../item.service';
 import { User, UserService } from '../user.service';
 
@@ -27,15 +27,13 @@ import { User, UserService } from '../user.service';
   templateUrl: './item-details.component.html',
   styleUrl: './item-details.component.css'
 })
-export class ItemDetailsComponent implements OnInit, OnDestroy {
+export class ItemDetailsComponent implements OnInit {
   item$: Observable<Item> = new Observable<Item>;
   reviews$: Observable<Review[]> = new Observable<Review[]>;
   user$: Observable<User | null> = of(null);
   reviewForm!: FormGroup;
   ratings: number[] = [1, 2, 3, 4, 5];
   errorMsg: String | null = null;
-
-  private destroy$ = new Subject<void>();
 
   constructor(
     private route: ActivatedRoute,
@@ -58,14 +56,9 @@ export class ItemDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
   onBuy() {
     const itemId = Number(this.route.snapshot.paramMap.get('item_id'));
-    this.user$.pipe(takeUntil(this.destroy$)).subscribe((user) => {
+    this.user$.pipe(take(1)).subscribe((user) => {
       if (!user) {
         this.snackBar.open('Log in to purchase', 'Close', { duration: 3000 });
         return;
@@ -92,7 +85,7 @@ export class ItemDetailsComponent implements OnInit, OnDestroy {
     const { rating, comment } = this.reviewForm.value;
     const itemId = this.route.snapshot.params['item_id'];
 
-    this.user$.pipe(takeUntil(this.destroy$)).subscribe((user) => {
+    this.user$.pipe(take(1)).subscribe((user) => {
       if (!user) {
         this.errorMsg = "Log in to submit a review";
         return;
@@ -101,6 +94,11 @@ export class ItemDetailsComponent implements OnInit, OnDestroy {
         next: () => {
           this.reviewForm.reset();
           this.reviews$ = this.itemService.getReviews(itemId);
+
+          // Reset the review form errors
+          Object.keys(this.reviewForm.controls).forEach(control => {
+            this.reviewForm.get(control)?.setErrors(null);
+          });
         },
         error: (err) => {
           this.errorMsg = "Error submitting review";
