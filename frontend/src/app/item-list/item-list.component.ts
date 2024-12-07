@@ -6,7 +6,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { RouterModule } from '@angular/router';
-import { BehaviorSubject, combineLatest, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
+import { BehaviorSubject, combineLatest, debounceTime, Observable, of, share, Subject, switchMap, takeUntil } from 'rxjs';
 import { ItemService, Item, Category } from '../item.service';
 import { User, UserService } from '../user.service';
 
@@ -47,6 +47,7 @@ export class ItemListComponent implements OnInit, OnDestroy {
     if (this.isUserListings) {
       this.items$ = combineLatest([this.user$, this.searchParams$]).pipe(
         takeUntil(this.destroy$),
+        debounceTime(200),
         switchMap(([user, params]) => {
           if (user) {
             const { query, category } = params;
@@ -57,16 +58,19 @@ export class ItemListComponent implements OnInit, OnDestroy {
             this.snackBar.open('Log in to see your listings', 'Close', { duration: 3000 });
             return of([]);
           }
-        })
+        }),
+        share()
       );
     } else {
       this.items$ = this.searchParams$.pipe(
         takeUntil(this.destroy$),
+        debounceTime(200),
         switchMap(({ query, category }) => {
           return category != 0
             ? this.itemService.searchItems(query, category)
             : this.itemService.searchItems(query);
-        })
+        }),
+        share()
       );
     }
   }
@@ -94,6 +98,6 @@ export class ItemListComponent implements OnInit, OnDestroy {
   }
 
   onSearch(): void {
-    this.searchParams$.next({ query: this.query, category: this.selectedCategory });
+    this.searchParams$.next({ query: this.query.trim(), category: this.selectedCategory });
   }
 }
