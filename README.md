@@ -55,7 +55,7 @@ CREATE TABLE Item (
    PRIMARY KEY (item_id),
    INDEX (item_title),
    FOREIGN KEY (seller_id) REFERENCES User(id) 
-      ON DELETE SET NULL ON UPDATE CASCADE, 
+      ON DELETE CASCADE ON UPDATE CASCADE, 
    FOREIGN KEY (category_id) REFERENCES Category(category_id)
       ON DELETE SET NULL ON UPDATE CASCADE
 ); 
@@ -72,7 +72,7 @@ CREATE TABLE Review (
    FOREIGN KEY (item_id) REFERENCES Item(item_id) 
       ON DELETE CASCADE ON UPDATE CASCADE,
    FOREIGN KEY (reviewer_id) REFERENCES User(id) 
-      ON DELETE SET NULL ON UPDATE CASCADE
+      ON DELETE CASCADE ON UPDATE CASCADE
 ); 
 
 -- 5. Create the Transaction Table 
