@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { AuthError } from '@angular/fire/auth';
+import { AuthError, EmailAuthProvider } from '@angular/fire/auth';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { catchError, firstValueFrom, map, Observable, of, switchMap, throwError } from 'rxjs';
+import { catchError, firstValueFrom, from, map, Observable, of, switchMap, throwError } from 'rxjs';
 
 export interface User {
   id: number;
@@ -46,7 +46,8 @@ export class UserService {
             return throwError(() => error);
           })
         );
-      }));
+      })
+    );
   }
 
   registerUser(email: string, password: string, name: string, phone: string): Promise<{ success: boolean; error: string | null }> {
@@ -76,6 +77,52 @@ export class UserService {
         console.error("Error during registration:", error);
         return { success: false, error: "Something went wrong while registering" };
       });
+  }
+
+  updateUser(user: User, password?: string): Observable<User> {
+    return from(this.auth.currentUser).pipe(
+      switchMap((firebaseUser) => {
+        // If changing emails, reauthenticate, then update email in Firebase and backend
+        if (firebaseUser && firebaseUser.email && user.email !== firebaseUser.email && password) {
+          const credential = EmailAuthProvider.credential(firebaseUser.email, password);
+          return from(firebaseUser.reauthenticateWithCredential(credential)).pipe(
+            switchMap(() => firebaseUser.updateEmail(user.email)),
+            switchMap(() => this.http.patch<User>(`/api/user/${user.id}`, user))
+          );
+        }
+        // If not changing emails, just update the backend
+        return this.http.patch<User>(`/api/user/${user.id}`, user);
+      })
+    );
+  }
+
+  deleteUser(userId: number, password: string): Observable<void> {
+    return from(this.auth.currentUser).pipe(
+      switchMap((user) => {
+        if (user && user.email) {
+          const credential = EmailAuthProvider.credential(user.email, password);
+          return from(user.reauthenticateWithCredential(credential)).pipe(
+            switchMap(() => this.http.delete(`/api/user/${userId}`)),
+            switchMap(() => user.delete()),
+          );
+        }
+        return throwError(() => new Error('No authenticated user found'));
+      })
+    );
+  }
+
+  changePassword(newPassword: string, oldPassword: string): Observable<void> {
+    return from(this.auth.currentUser).pipe(
+      switchMap((user) => {
+        if (user && user.email) {
+          const credential = EmailAuthProvider.credential(user.email, oldPassword);
+          return from(user.reauthenticateWithCredential(credential)).pipe(
+            switchMap(() => user.updatePassword(newPassword))
+          );
+        }
+        return throwError(() => new Error('No authenticated user found'));
+      })
+    );
   }
 
   getTransactions(userId: number): Observable<UserTransaction> {

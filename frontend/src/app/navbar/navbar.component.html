@@ -13,6 +13,7 @@
     <mat-icon class="user-icon">account_circle</mat-icon>
   </button>
   <mat-menu #userMenu>
+    <button mat-menu-item *ngIf="loggedIn" routerLink="settings">Settings</button>
     <button mat-menu-item *ngIf="loggedIn" (click)="logout()">Log out</button>
     <button mat-menu-item *ngIf="!loggedIn" routerLink="login">Sign in</button>
   </mat-menu>

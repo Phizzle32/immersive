@@ -1,0 +1,19 @@
+h2 {
+    justify-self: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+mat-form-field {
+    margin-bottom: 8px;
+}
+
+.actions {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}

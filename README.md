@@ -29,7 +29,7 @@ USE immersive;
 -- 1. Create the Category Table 
 CREATE TABLE Category ( 
    category_id INT AUTO_INCREMENT,
-   category_name VARCHAR(100) NOT NULL,
+   category_name VARCHAR(100) UNIQUE NOT NULL,
    PRIMARY KEY (category_id), 
    INDEX (category_name) 
 ); 
