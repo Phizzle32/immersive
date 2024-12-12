@@ -3,10 +3,12 @@ import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angu
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { RouterModule } from '@angular/router';
-import { BehaviorSubject, combineLatest, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
+import { BehaviorSubject, combineLatest, debounceTime, Observable, of, share, Subject, switchMap, takeUntil } from 'rxjs';
+import { ConfirmModalComponent } from '../confirm-modal/confirm-modal.component';
 import { ItemService, Item, Category } from '../item.service';
 import { User, UserService } from '../user.service';
 
@@ -41,12 +43,14 @@ export class ItemListComponent implements OnInit, OnDestroy {
     private itemService: ItemService,
     private userService: UserService,
     private snackBar: MatSnackBar,
+    private dialog: MatDialog,
   ) { }
 
   ngOnInit(): void {
     if (this.isUserListings) {
       this.items$ = combineLatest([this.user$, this.searchParams$]).pipe(
         takeUntil(this.destroy$),
+        debounceTime(200),
         switchMap(([user, params]) => {
           if (user) {
             const { query, category } = params;
@@ -57,16 +61,19 @@ export class ItemListComponent implements OnInit, OnDestroy {
             this.snackBar.open('Log in to see your listings', 'Close', { duration: 3000 });
             return of([]);
           }
-        })
+        }),
+        share()
       );
     } else {
       this.items$ = this.searchParams$.pipe(
         takeUntil(this.destroy$),
+        debounceTime(200),
         switchMap(({ query, category }) => {
           return category != 0
             ? this.itemService.searchItems(query, category)
             : this.itemService.searchItems(query);
-        })
+        }),
+        share()
       );
     }
   }
@@ -81,19 +88,31 @@ export class ItemListComponent implements OnInit, OnDestroy {
   }
 
   onDelete(item: Item) {
-    this.itemService.deleteItem(item).subscribe({
-      next: () => {
-        this.onSearch();
-        this.snackBar.open('Item deleted successfully', 'Close', { duration: 3000 });
-      },
-      error: (err) => {
-        this.snackBar.open('Error deleting item', 'Close', { duration: 3000 });
-        console.error('Error deleting item:', err);
-      },
+    const confirmModal = this.dialog.open(ConfirmModalComponent, {
+      data: {
+        title: 'Delete Item',
+        description: 'Are you sure you want to delete this item?',
+        actionButtonText: 'Delete'
+      }
+    });
+
+    confirmModal.afterClosed().subscribe((confirm) => {
+      if (confirm) {
+        this.itemService.deleteItem(item).subscribe({
+          next: () => {
+            this.onSearch();
+            this.snackBar.open('Item deleted successfully', 'Close', { duration: 3000 });
+          },
+          error: (err) => {
+            this.snackBar.open('Error deleting item', 'Close', { duration: 3000 });
+            console.error('Error deleting item:', err);
+          }
+        });
+      }
     });
   }
 
   onSearch(): void {
-    this.searchParams$.next({ query: this.query, category: this.selectedCategory });
+    this.searchParams$.next({ query: this.query.trim(), category: this.selectedCategory });
   }
 }

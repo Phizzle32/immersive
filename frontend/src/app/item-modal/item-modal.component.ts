@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -25,7 +25,7 @@ import { Category, Item, ItemService } from '../item.service';
   templateUrl: './item-modal.component.html',
   styleUrl: './item-modal.component.css'
 })
-export class ItemModalComponent {
+export class ItemModalComponent implements OnInit {
   itemForm!: FormGroup;
   categories$: Observable<Category[]> = new Observable<Category[]>;
   data: Item = inject(MAT_DIALOG_DATA);

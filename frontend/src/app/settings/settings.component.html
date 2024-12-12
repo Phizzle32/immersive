@@ -1,0 +1,56 @@
+<h2>Settings</h2>
+<form [formGroup]="settingsForm" (ngSubmit)="onSave()">
+    <mat-form-field appearance="outline">
+        <mat-label>Display Name</mat-label>
+        <input matInput [formControl]="displayName">
+        <mat-error *ngIf="displayName.hasError('required')">Name is required</mat-error>
+        <mat-error *ngIf="!displayName.hasError('required') && displayName.hasError('minlength')">
+            Min 2 characters
+        </mat-error>
+        <mat-error *ngIf="!displayName.hasError('minlength') && displayName.hasError('pattern')">
+            Check formating
+        </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+        <mat-label>Email</mat-label>
+        <input matInput [formControl]="email" type="email" (blur)="onBlurEmail()">
+        <mat-error *ngIf="email.hasError('required')">Email is required</mat-error>
+        <mat-error *ngIf="email.hasError('email')">Please enter a valid email</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+        <mat-label>Password</mat-label>
+        <input matInput [formControl]="password" [type]="passwordVisibility" (blur)="onBlurPassword()">
+        <button mat-icon-button matSuffix type="button" (click)="togglePasswordVisibility()">
+            <mat-icon>{{passwordVisibility === 'password' ? 'visibility_off' : 'visibility'}}</mat-icon>
+        </button>
+        <mat-error *ngIf="password.hasError('required')">Password is required</mat-error>
+        <mat-error *ngIf="password.hasError('incorrect')">Password is incorrect</mat-error>
+    </mat-form-field>
+
+    <mat-form-field hintLabel="Min 6 characters" appearance="outline">
+        <mat-label>New Password</mat-label>
+        <input matInput [formControl]="newPassword" type="password" (blur)="onBlurPassword()">
+        <mat-error *ngIf="newPassword.hasError('samePassword')">
+            Password must be different from current password
+        </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+        <mat-label>Confirm Password</mat-label>
+        <input matInput [formControl]="confirmPassword" type="password" (blur)="onBlurPassword()">
+        <mat-error *ngIf="confirmPassword.hasError('passwordMismatch')">Passwords must match</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+        <mat-label>Phone Number</mat-label>
+        <input matInput [formControl]="phoneNumber">
+        <mat-error *ngIf="phoneNumber.hasError('required')">Phone number is required</mat-error>
+    </mat-form-field>
+
+    <div class="actions">
+        <button mat-raised-button color="primary" type="submit" [disabled]="this.settingsForm.invalid">Save</button>
+        <button mat-raised-button color="warn" type="button" (click)="deleteAccount()">Delete Account</button>
+    </div>
+</form>

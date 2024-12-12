@@ -1,0 +1,14 @@
+mat-dialog-content {
+    min-width: 300px;
+}
+
+mat-dialog-actions {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 5px;
+}
+
+button {
+    flex: 1;
+    max-width: 40%;
+}

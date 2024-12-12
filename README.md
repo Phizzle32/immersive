@@ -29,7 +29,7 @@ USE immersive;
 -- 1. Create the Category Table 
 CREATE TABLE Category ( 
    category_id INT AUTO_INCREMENT,
-   category_name VARCHAR(100) NOT NULL,
+   category_name VARCHAR(100) UNIQUE NOT NULL,
    PRIMARY KEY (category_id), 
    INDEX (category_name) 
 ); 
@@ -55,7 +55,7 @@ CREATE TABLE Item (
    PRIMARY KEY (item_id),
    INDEX (item_title),
    FOREIGN KEY (seller_id) REFERENCES User(id) 
-      ON DELETE SET NULL ON UPDATE CASCADE, 
+      ON DELETE CASCADE ON UPDATE CASCADE, 
    FOREIGN KEY (category_id) REFERENCES Category(category_id)
       ON DELETE SET NULL ON UPDATE CASCADE
 ); 
@@ -72,7 +72,7 @@ CREATE TABLE Review (
    FOREIGN KEY (item_id) REFERENCES Item(item_id) 
       ON DELETE CASCADE ON UPDATE CASCADE,
    FOREIGN KEY (reviewer_id) REFERENCES User(id) 
-      ON DELETE SET NULL ON UPDATE CASCADE
+      ON DELETE CASCADE ON UPDATE CASCADE
 ); 
 
 -- 5. Create the Transaction Table 
@@ -132,5 +132,5 @@ INSERT INTO Transaction (item_id, item_title, price, buyer_id, seller_id, date) 
 ### 6. Start the development server
 `npm start`
 
-## 7. Navigate to the website
+### 7. Navigate to the website
 Open your browser and go to http://localhost:4200/
