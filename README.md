@@ -132,5 +132,5 @@ INSERT INTO Transaction (item_id, item_title, price, buyer_id, seller_id, date) 
 ### 6. Start the development server
 `npm start`
 
-## 7. Navigate to the website
+### 7. Navigate to the website
 Open your browser and go to http://localhost:4200/
