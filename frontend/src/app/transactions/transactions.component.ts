@@ -3,6 +3,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
+import { RouterModule } from '@angular/router';
 import { Observable, Subject, takeUntil } from 'rxjs';
 import { Transaction, User, UserService, UserTransaction } from '../user.service';
 
@@ -12,7 +13,8 @@ import { Transaction, User, UserService, UserTransaction } from '../user.service
   imports: [
     CommonModule,
     MatCardModule,
-    MatTableModule
+    MatTableModule,
+    RouterModule
   ],
   templateUrl: './transactions.component.html',
   styleUrl: './transactions.component.css'

@@ -15,7 +15,9 @@
                 <!-- Item Column -->
                 <ng-container matColumnDef="item">
                     <th mat-header-cell *matHeaderCellDef>Item</th>
-                    <td mat-cell *matCellDef="let purchase">{{ purchase.item_title }}</td>
+                    <td mat-cell *matCellDef="let purchase" [routerLink]="['/items', purchase.item_id]" class="item-title">
+                        {{ purchase.item_title }}
+                    </td>
                 </ng-container>
 
                 <!-- Price Column -->
@@ -43,7 +45,9 @@
                 <!-- Item Column -->
                 <ng-container matColumnDef="item">
                     <th mat-header-cell *matHeaderCellDef>Item</th>
-                    <td mat-cell *matCellDef="let sale">{{ sale.item_title }}</td>
+                    <td mat-cell *matCellDef="let sale" [routerLink]="['/items', sale.item_id]" class="item-title">
+                        {{ sale.item_title }}
+                    </td>
                 </ng-container>
 
                 <!-- Price Column -->

@@ -19,14 +19,14 @@ router.get('/user/:user_id', async (req, res) => {
 
     try {
         const [purchases] = await db.query(
-            `SELECT trans_id, item_title, price, date
+            `SELECT trans_id, item_id, item_title, price, date
              FROM Transaction
              WHERE buyer_id = ?
              ORDER BY date`,
             [user_id]
         );
         const [sales] = await db.query(
-            `SELECT trans_id, item_title, price, date
+            `SELECT trans_id, item_id, item_title, price, date
              FROM Transaction
              WHERE seller_id = ?
              ORDER BY date`,

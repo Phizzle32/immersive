@@ -33,7 +33,7 @@ export class ItemDetailsComponent implements OnInit {
   user$: Observable<User | null> = of(null);
   reviewForm!: FormGroup;
   ratings: number[] = [1, 2, 3, 4, 5];
-  errorMsg: String | null = null;
+  isLoading = true;
 
   constructor(
     private route: ActivatedRoute,
@@ -52,6 +52,10 @@ export class ItemDetailsComponent implements OnInit {
       this.reviewForm = this.fb.group({
         rating: [null, [Validators.required]],
         comment: ['', [Validators.required, Validators.minLength(3)]]
+      });
+
+      this.item$.subscribe({
+        complete: () => setTimeout(() => this.isLoading = false, 100)
       });
     }
   }
@@ -77,17 +81,12 @@ export class ItemDetailsComponent implements OnInit {
   }
 
   onSubmitReview() {
-    if (this.reviewForm.invalid) {
-      this.errorMsg = "Please fill out all fields";
-      return;
-    }
-
     const { rating, comment } = this.reviewForm.value;
     const itemId = this.route.snapshot.params['item_id'];
 
     this.user$.pipe(take(1)).subscribe((user) => {
       if (!user) {
-        this.errorMsg = "Log in to submit a review";
+        this.snackBar.open('Log in to submit a review', 'Close', { duration: 3000 });
         return;
       }
       this.itemService.submitReview(itemId, user.id, comment, rating).subscribe({
@@ -101,8 +100,8 @@ export class ItemDetailsComponent implements OnInit {
           });
         },
         error: (err) => {
-          this.errorMsg = "Error submitting review";
-          console.error(this.errorMsg, err);
+          this.snackBar.open('Error submitting review', 'Close', { duration: 3000 });
+          console.error('Error submitting review', err);
         }
       });
     });

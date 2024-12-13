@@ -13,6 +13,7 @@ export interface User {
 
 export interface Transaction {
   trans_id: number;
+  item_id: number;
   item_title: string;
   price: number;
   date: string;

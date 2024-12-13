@@ -27,9 +27,13 @@ table {
     margin-bottom: auto;
 }
 
-.sales p,
 .transactions p {
-    margin-bottom: 2px;
+    margin-bottom: 5px;
+}
+
+.item-title:hover {
+    text-decoration: underline;
+    cursor: pointer;
 }
 
 .balance {
