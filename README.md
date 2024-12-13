@@ -1,8 +1,12 @@
-# Immersive
+<p align="center">
+  <img src="./frontend/src/logo.ico" alt="Logo" height="100" width="100">
+   <h1 align="center">Immersive</h1>
+</p>
 
-## Description
 Immersive is a full-stack web application built for efficient sales data management. It empowers retailers, business owners, and sellers with tools to track sales, manage inventory, and analyze customer behavior,
 enabling data-driven decisions to optimize operations and enhance customer experiences.
+
+---
 
 ## Running the Code
 Follow these steps to set up and run the project:
